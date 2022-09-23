@@ -1,0 +1,20 @@
+---
+- name: Jenkins Instalation
+  hosts: all
+  become: yes
+  tasks:
+
+  - name:  Apt-get Update files and Cache
+    shell: curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+  
+  - name: Echo to know where is the key
+    shell: echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list 
+
+  - name:  Apt-get Update files and Cache
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    
+  - name: Install ngrok
+    apt:
+      name: ngrok
+      state: present
+  

@@ -1,0 +1,39 @@
+---
+- name: backend Deployment
+  hosts: all
+  become: true
+  tasks:  
+
+    - name:  Apt-get Update files and Cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    
+    - name: Install java 8
+      apt: 
+        name: openjdk-8-jdk
+        state: present
+
+    - name: Get Nexus tar
+      get_url:
+        url: https://download.sonatype.com/nexus/3/nexus-3.41.1-01-unix.tar.gz
+        dest: /home/vagrant 
+
+    - name: Extract nexus.tar.qz
+      unarchive:
+        src: /home/vagrant/nexus-3.41.1-01-unix.tar.gz
+        dest: /home/vagrant
+
+    - name: Move nexus folder
+      shell: cd /home/vagrant && mv nexus-3.41.1-01 nexus
+      ignore_errors: yes
+
+    - name: Permission
+      shell: cd /home/vagrant && sudo chown -R vagrant:vagrant nexus
+      shell: cd /home/vagrant && sudo chown -R vagrant:vagrant sonatype-work
+      ignore_errors: yes
+
+    - name: Stop nexus
+      shell: cd /home/vagrant && ./nexus/bin/nexus start
+      ignore_errors: yes
+
+    - name: Start nexus
+      shell: cd /home/vagrant && ./nexus/bin/nexus start

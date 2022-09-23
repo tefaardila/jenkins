@@ -1,0 +1,43 @@
+---
+- name: Jenkins Instalation
+  hosts: all
+  become: yes
+  tasks:
+
+  - name:  Apt-get Update files and Cache
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+  - name: Install java 11
+    apt: 
+      name: openjdk-11-jdk
+      state: present
+
+
+  - name: Get repository GPG key
+    shell: curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+  - name: Echo to know where is the key
+    shell: echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+  - name: Install Certificates
+    shell: sudo apt install ca-certificates
+
+  - name:  Apt-get Update files 
+    apt: update_cache=yes force_apt_get=yes
+
+  - name: Install jenkins
+    shell: sudo apt install jenkins
+
+  - name: Get jenkins status 1
+    shell: sudo systemctl status jenkins
+    ignore_errors: yes
+
+  - name: Start jenkins with systemclt
+    ansible.builtin.systemd:
+      name: jenkins
+      state: started
+  
+  - name: Get jenkins status 2
+    shell: sudo systemctl status jenkins
+    ignore_errors: yes
+
